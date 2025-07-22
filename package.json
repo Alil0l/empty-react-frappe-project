@@ -1,0 +1,45 @@
+{
+  "name": "farha",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build --base=/assets/kiswat_farah/farha/ && yarn copy-html-entry",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "copy-html-entry": "cp ../kiswat_farah/public/farha/index.html ../kiswat_farah/www/farha.html"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.3.0",
+    "@mui/material": "^6.3.0",
+    "@react-google-maps/api": "^2.20.6",
+    "@tanstack/react-query": "^5.64.2",
+    "axios": "^1.7.9",
+    "frappe-react-sdk": "^1.9.0",
+    "i18next": "^24.2.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-i18next": "^15.4.0",
+    "react-router-dom": "^6.28.1",
+    "react-toastify": "^11.0.2",
+    "socket.io-client": "^4.8.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.17.0",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.16",
+    "globals": "^15.14.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "vite": "^6.0.5"
+  }
+}
