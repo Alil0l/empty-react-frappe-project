@@ -1,3 +1,13 @@
 {
-    "hello": "Hello"
+    "hello": "Hello",
+    "nav": {
+        "home": "Home",
+        "courses": "Courses",
+        "about": "About",
+        "contact": "Contact",
+        "login": "Login",
+        "signup": "Sign Up",
+        "dashboard": "Dashboard",
+        "tagline": "Engineering Excellence"
+    }
 }

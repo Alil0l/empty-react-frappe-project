@@ -19,7 +19,7 @@ export default function Layout() {
   return (
     <>
     <Navbar />
-      <div className="layout">
+      <div className="layout pt-14 md:pt-16">
         {isLoading && <Spinner />}
         <Outlet />
         <ToastContainer

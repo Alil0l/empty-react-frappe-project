@@ -1,5 +1,5 @@
 import { useState, createContext, useContext, useEffect } from 'react'
-import { socket } from './../socket'
+// import { socket } from './../socket'
 import { useAppContext } from './AppContext'
 
 const UserContext = createContext(null);
@@ -35,9 +35,9 @@ export const UserProvider = ({ children }) => {
             setCurrUser(userData.data);
             setIsLoading(false);
             setIsLoggdedIn(true);
-          socket.on(userData.data.email,()=>{
-            setNewNotification(true)
-          })
+          // socket.on(userData.data.email,()=>{
+          //   setNewNotification(true)
+          // })
         }
         } else {
           setIsLoggdedIn(false);

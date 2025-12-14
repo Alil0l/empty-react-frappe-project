@@ -5,7 +5,7 @@ import proxyOptions from './proxyOptions';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	base: '/farha/',
+	base: '/portal/',
 	plugins: [react()],
 	server: {
 		port: 8080,
@@ -18,7 +18,7 @@ export default defineConfig({
 		}
 	},
 	build: {
-		outDir: '../kiswat_farah/public/farha',
+		outDir: '../landing/public/portal',
 		emptyOutDir: true,
 		target: 'es2015',
 		minify: false,

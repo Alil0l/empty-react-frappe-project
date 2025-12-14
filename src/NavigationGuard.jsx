@@ -14,14 +14,14 @@ const NavigationGuard = ({ children }) => {
     useEffect(() => {
         const checkNavigation = async () => {
             const { pathname } = location;
-            const publicRoutes = ["/farha/login", "/farha/forget-password", "/farha/signup", "/farha/otp"];
+            const publicRoutes = ["/portal/login", "/portal/forget-password", "/portal/signup", "/portal/otp"];
 
             // Check if current route is public
             const isPublicRoute = publicRoutes.includes(pathname);
 
             // If logged in user tries to access public routes, redirect to home
             if (isPublicRoute && isLoggdedIn) {
-                navigate("/farha/home", { replace: true });
+                navigate("/portal/home", { replace: true });
                 return;
             }
 
@@ -32,7 +32,7 @@ const NavigationGuard = ({ children }) => {
 
             // Check authentication
             if (!isLoggdedIn) {
-                navigate("/farha/login", { replace: true });
+                navigate("/portal/login", { replace: true });
                 return;
             }
 

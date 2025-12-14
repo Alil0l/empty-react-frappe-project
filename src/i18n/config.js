@@ -39,4 +39,16 @@ i18n.use(initReactI18next).init({
   }
 });
 
+// Set initial document direction
+if (typeof window !== 'undefined') {
+  const savedLang = localStorage.getItem('i18nextLng') || 'ar';
+  document.documentElement.dir = savedLang === 'ar' ? 'rtl' : 'ltr';
+  
+  // Update direction when language changes
+  i18n.on('languageChanged', (lng) => {
+    document.documentElement.dir = lng === 'ar' ? 'rtl' : 'ltr';
+    localStorage.setItem('i18nextLng', lng);
+  });
+}
+
 export default i18n;

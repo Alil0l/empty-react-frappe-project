@@ -1,4 +1,4 @@
-# Farha
+# portal
 
 A modern React web application built with Vite, featuring real-time capabilities, internationalization, and Frappe framework integration.
 
@@ -41,7 +41,7 @@ A modern React web application built with Vite, featuring real-time capabilities
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd farha
+   cd portal
    ```
 
 2. **Install dependencies**
@@ -71,7 +71,7 @@ A modern React web application built with Vite, featuring real-time capabilities
 ## 🏗️ Project Structure
 
 ```
-farha/
+portal/
 ├── public/                 # Static assets
 ├── src/
 │   ├── assets/            # Images, icons, etc.
@@ -110,7 +110,7 @@ The app features a complete authentication system with:
 
 ## 🌐 Internationalization
 
-Farha supports multiple languages:
+portal supports multiple languages:
 
 - **Arabic** (Default) - RTL layout support
 - **English** - LTR layout support
@@ -146,22 +146,22 @@ The app uses a combination of:
 npm run build
 ```
 
-This creates an optimized build in the `../kiswat_farah/public/farha/` directory.
+This creates an optimized build in the `../landing/public/portal/` directory.
 
 ### Environment Configuration
 
 The app is configured to work with:
-- **Base URL**: `/farha/`
+- **Base URL**: `/portal/`
 - **Development Port**: `8080`
 - **Proxy Configuration**: Automatic backend API routing
 
 ## 🔧 Configuration
 
 ### Vite Configuration
-- **Base Path**: `/farha/`
+- **Base Path**: `/portal/`
 - **Dev Server**: Port 8080, accessible on all network interfaces
 - **Proxy**: Automatic routing to Frappe backend
-- **Build Output**: `../kiswat_farah/public/farha/`
+- **Build Output**: `../landing/public/portal/`
 
 ### Frappe Integration
 The app integrates with Frappe framework through:
