@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { withTranslation } from 'react-i18next';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -25,9 +26,11 @@ class ErrorBoundary extends React.Component {
   };
 
   render() {
+    const { t } = this.props;
+    
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-myprimary via-myprimary to-[#2a2d6c] flex items-center justify-center px-4">
+        <div className="min-h-screen bg-gradient-to-br from-resk-darkest via-resk-dark to-resk-primary flex items-center justify-center px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -62,7 +65,7 @@ class ErrorBoundary extends React.Component {
               transition={{ delay: 0.3 }}
               className="text-4xl md:text-5xl font-bold text-white mb-4 font-['Poppins']"
             >
-              Oops! Something went wrong
+              {t('errorBoundary.title', "Oops! Something went wrong")}
             </motion.h1>
 
             <motion.p
@@ -71,7 +74,7 @@ class ErrorBoundary extends React.Component {
               transition={{ delay: 0.4 }}
               className="text-lg text-gray-300 mb-8 font-['Inter']"
             >
-              We're sorry, but something unexpected happened. Please try again or contact support if the problem persists.
+              {t('errorBoundary.message', "We're sorry, but something unexpected happened. Please try again or contact support if the problem persists.")}
             </motion.p>
 
             {process.env.NODE_ENV === 'development' && this.state.error && (
@@ -104,7 +107,7 @@ class ErrorBoundary extends React.Component {
                 onClick={this.handleReset}
                 className="px-8 py-4 bg-mysecondary text-white rounded-lg font-semibold text-lg font-['Inter'] shadow-lg shadow-mysecondary/30 hover:shadow-mysecondary/50 transition-shadow"
               >
-                Go to Home
+                {t('errorBoundary.goHome', 'Go to Home')}
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -112,7 +115,7 @@ class ErrorBoundary extends React.Component {
                 onClick={() => window.location.reload()}
                 className="px-8 py-4 bg-transparent border-2 border-white/30 text-white rounded-lg font-semibold text-lg font-['Inter'] hover:border-white/50 hover:bg-white/10 transition-all"
               >
-                Reload Page
+                {t('errorBoundary.reload', 'Reload Page')}
               </motion.button>
             </motion.div>
           </motion.div>
@@ -124,4 +127,4 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-export default ErrorBoundary;
+export default withTranslation()(ErrorBoundary);

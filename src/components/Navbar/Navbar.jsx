@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import i18n from '../../i18n/config';
@@ -13,15 +13,19 @@ import {
   HiChevronDown,
   HiCheck,
   HiUser,
-  HiLogin
+  HiLogin,
+  HiLogout
 } from 'react-icons/hi';
-import { FaGraduationCap, FaGlobe } from 'react-icons/fa';
+import { FaGlobe } from 'react-icons/fa';
+import logoImage from '../../assets/LOGO.png';
+import axios from 'axios';
 
 export default function Navbar() {
   const { t } = useTranslation();
   const { isDarkMode, toggleTheme } = useTheme();
-  const { isLoggdedIn } = useUserContext();
+  const { isLoggdedIn, setIsLoggdedIn, setCurrUser } = useUserContext();
   const location = useLocation();
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -34,6 +38,9 @@ export default function Navbar() {
     }
   });
   const langMenuRef = useRef(null);
+  const mobileMenuRef = useRef(null);
+  const navRef = useRef(null);
+  const mobileMenuButtonRef = useRef(null);
 
   const isRTL = currentLanguage === 'ar';
 
@@ -107,6 +114,74 @@ export default function Navbar() {
     };
   }, []);
 
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      // Save current scroll position
+      const scrollY = window.scrollY;
+      // Prevent scroll
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Restore scroll
+      const scrollY = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.overflow = '';
+      if (scrollY) {
+        // Parse the negative scroll position (e.g., "-100px" -> 100)
+        const scrollValue = Math.abs(parseInt(scrollY.replace('px', ''), 10));
+        window.scrollTo(0, scrollValue);
+      }
+    }
+
+    return () => {
+      // Cleanup on unmount
+      const scrollY = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.overflow = '';
+      if (scrollY) {
+        const scrollValue = Math.abs(parseInt(scrollY.replace('px', ''), 10));
+        window.scrollTo(0, scrollValue);
+      }
+    };
+  }, [isMobileMenuOpen]);
+
+  // Handle click outside to close mobile menu
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Check if click is outside the mobile menu and not on the mobile menu button
+      if (
+        isMobileMenuOpen &&
+        mobileMenuRef.current &&
+        mobileMenuButtonRef.current &&
+        !mobileMenuRef.current.contains(event.target) &&
+        !mobileMenuButtonRef.current.contains(event.target)
+      ) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    if (isMobileMenuOpen) {
+      // Use a slight delay to avoid immediate closure when opening
+      const timeoutId = setTimeout(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('touchstart', handleClickOutside);
+      }, 100);
+
+      return () => {
+        clearTimeout(timeoutId);
+        document.removeEventListener('mousedown', handleClickOutside);
+        document.removeEventListener('touchstart', handleClickOutside);
+      };
+    }
+  }, [isMobileMenuOpen]);
+
   // Close mobile menu when route changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
@@ -123,6 +198,25 @@ export default function Navbar() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await axios.post('/api/method/logout', {}, {
+        headers: {
+          'X-Frappe-CSRF-Token': window.csrf_token
+        }
+      });
+      setIsLoggdedIn(false);
+      setCurrUser('');
+      navigate('/portal/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Even if API call fails, clear local state and redirect
+      setIsLoggdedIn(false);
+      setCurrUser('');
+      navigate('/portal/login');
+    }
+  };
+
   const languages = [
     { code: 'en', name: 'English', flag: '🇬🇧' },
     { code: 'ar', name: 'العربية', flag: '🇸🇦' },
@@ -130,7 +224,6 @@ export default function Navbar() {
 
   const navLinks = [
     { path: '/portal', label: t('nav.home', 'Home') },
-    { path: '/portal/courses', label: t('nav.courses', 'Courses') },
     { path: '/portal/about', label: t('nav.about', 'About') },
     { path: '/portal/contact', label: t('nav.contact', 'Contact') },
   ];
@@ -142,8 +235,14 @@ export default function Navbar() {
     return location.pathname.startsWith(path);
   };
 
+  // Don't render navbar if user is not logged in
+  if (!isLoggdedIn) {
+    return null;
+  }
+
   return (
     <motion.nav
+      ref={navRef}
       initial={{ y: -100 }}
       animate={{ y: isVisible ? 0 : -100 }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
@@ -153,24 +252,19 @@ export default function Navbar() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 md:h-16">
           {/* Logo */}
-          <Link to="/portal" className="flex items-center space-x-2 rtl:space-x-reverse group">
+          <Link to="/portal" className="max-h-14 overflow-hidden flex items-center space-x-2 rtl:space-x-reverse group">
             <motion.div
-              whileHover={{ scale: 1.1, rotate: [0, -10, 10, -10, 0] }}
-              transition={{ duration: 0.5 }}
-              className="p-1.5 bg-gradient-to-br from-mysecondary to-[#00d4b8] rounded-lg shadow-md shadow-mysecondary/30"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.3 }}
+              className={`flex items-center px-3 py-2 rounded-lg transition-all duration-200 ${
+                !isDarkMode ? 'bg-resk-dark max-h-8 md:max-h-12 backdrop-blur-sm' : ''
+              }`}
             >
-              <FaGraduationCap className="w-4 h-4 text-white" />
-            </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="flex flex-col"
-            >
-              <span className="text-base md:text-lg font-bold font-['Poppins'] bg-gradient-to-r from-mysecondary to-[#00d4b8] bg-clip-text text-transparent">
-                RESK Academy
-              </span>
-              <span className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 font-['Inter'] -mt-0.5">
-                {t('nav.tagline', 'Engineering Excellence')}
-              </span>
+              <img 
+                src={logoImage} 
+                alt={t('nav.logo', 'RESK Academy Logo')} 
+                className="md:w-32 w-20 h-auto object-contain"
+              />
             </motion.div>
           </Link>
 
@@ -189,7 +283,7 @@ export default function Navbar() {
                     className={`px-3 py-1.5 rounded-lg text-sm font-['Inter'] font-medium transition-all duration-200 ${
                       active
                         ? 'text-mysecondary dark:text-mysecondary bg-mysecondary/10 dark:bg-mysecondary/20'
-                        : 'text-gray-700 dark:text-gray-300 hover:text-mysecondary dark:hover:text-mysecondary hover:bg-gray-100 dark:hover:bg-gray-800/50'
+                        : 'text-gray-700 dark:text-gray-300 hover:text-mysecondary dark:hover:text-resk-light hover:bg-gray-100 dark:hover:bg-resk-secondary/30'
                     }`}
                   >
                     <span>{link.label}</span>
@@ -213,8 +307,8 @@ export default function Navbar() {
               whileHover={{ scale: 1.1, rotate: 180 }}
               whileTap={{ scale: 0.9 }}
               onClick={toggleTheme}
-              className="relative p-1.5 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 text-gray-700 dark:text-gray-300 hover:shadow-md transition-all duration-300 group"
-              aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              className="relative p-1.5 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-resk-secondary/40 dark:to-resk-secondary/60 text-gray-700 dark:text-gray-300 hover:shadow-md transition-all duration-300 group"
+              aria-label={isDarkMode ? t('nav.switchToLight', 'Switch to light mode') : t('nav.switchToDark', 'Switch to dark mode')}
             >
               <motion.div
                 initial={false}
@@ -222,9 +316,9 @@ export default function Navbar() {
                 transition={{ duration: 0.3 }}
               >
                 {isDarkMode ? (
-                  <HiSun className="w-4 h-4 text-yellow-500" />
+                  <HiSun className="w-4 h-4" />
                 ) : (
-                  <HiMoon className="w-4 h-4 text-blue-600" />
+                  <HiMoon className="w-4 h-4" />
                 )}
               </motion.div>
             </motion.button>
@@ -235,8 +329,8 @@ export default function Navbar() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                className="flex items-center space-x-1.5 rtl:space-x-reverse px-2 py-1.5 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 text-gray-700 dark:text-gray-300 hover:shadow-md transition-all duration-200 font-['Inter'] font-medium"
-                aria-label="Change language"
+                className="flex items-center space-x-1.5 rtl:space-x-reverse px-2 py-1.5 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-resk-secondary/40 dark:to-resk-secondary/60 text-gray-700 dark:text-gray-300 hover:shadow-md transition-all duration-200 font-['Inter'] font-medium"
+                aria-label={t('nav.changeLanguage', 'Change language')}
               >
                 <FaGlobe className="w-4 h-4" />
                 <span className="text-xs font-medium">{languages.find(l => l.code === currentLanguage)?.code.toUpperCase()}</span>
@@ -260,7 +354,7 @@ export default function Navbar() {
                           whileHover={{ x: isRTL ? -4 : 4 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => toggleLanguage(lang.code)}
-                          className={`w-full px-3 py-2 text-start hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors flex items-center space-x-2 rtl:space-x-reverse text-sm ${
+                          className={`w-full px-3 py-2 text-start hover:bg-gray-50 dark:hover:bg-resk-secondary/40 transition-colors flex items-center space-x-2 rtl:space-x-reverse text-sm ${
                             isActive
                               ? 'bg-mysecondary/10 dark:bg-mysecondary/20 text-mysecondary dark:text-mysecondary'
                               : 'text-gray-700 dark:text-gray-300'
@@ -294,35 +388,49 @@ export default function Navbar() {
               >
                 <Link
                   to="/portal/login"
-                  className="flex items-center space-x-1.5 rtl:space-x-reverse px-3 py-1.5 bg-gradient-to-r from-mysecondary to-[#00d4b8] text-white rounded-lg text-sm font-semibold font-['Inter'] hover:shadow-md hover:shadow-mysecondary/30 transition-all duration-200"
+                  className="flex items-center space-x-1.5 rtl:space-x-reverse px-3 py-1.5 bg-gradient-to-r from-resk-primary to-resk-secondary text-white rounded-lg text-sm font-semibold font-['Inter'] hover:shadow-md hover:shadow-resk-secondary/30 transition-all duration-200"
                 >
                   <HiLogin className="w-4 h-4" />
                   <span>{t('nav.login', 'Login')}</span>
                 </Link>
               </motion.div>
             ) : (
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="hidden sm:block"
-              >
-                <Link
-                  to="/portal/dashboard"
-                  className="flex items-center space-x-1.5 rtl:space-x-reverse px-3 py-1.5 bg-gradient-to-r from-mysecondary to-[#00d4b8] text-white rounded-lg text-sm font-semibold font-['Inter'] hover:shadow-md hover:shadow-mysecondary/30 transition-all duration-200"
+              <>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="hidden sm:block"
                 >
-                  <HiUser className="w-4 h-4" />
-                  <span>{t('nav.dashboard', 'Dashboard')}</span>
-                </Link>
-              </motion.div>
+                  <Link
+                    to="/portal/dashboard"
+                    className="flex items-center space-x-1.5 rtl:space-x-reverse px-3 py-1.5 bg-gradient-to-r from-resk-primary to-resk-secondary text-white rounded-lg text-sm font-semibold font-['Inter'] hover:shadow-md hover:shadow-resk-secondary/30 transition-all duration-200"
+                  >
+                    <HiUser className="w-4 h-4" />
+                    <span>{t('nav.dashboard', 'Dashboard')}</span>
+                  </Link>
+                </motion.div>
+                {/* Logout Button */}
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleLogout}
+                  className="hidden sm:flex items-center justify-center p-1.5 rounded-lg bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900 dark:to-red-800 text-red-600 dark:text-red-300 hover:shadow-md transition-all duration-200"
+                  aria-label={t('nav.logout', 'Logout')}
+                  title={t('nav.logout', 'Logout')}
+                >
+                  <HiLogout className="w-4 h-4" />
+                </motion.button>
+              </>
             )}
 
             {/* Mobile Menu Button */}
             <motion.button
+              ref={mobileMenuButtonRef}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-1.5 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 text-gray-700 dark:text-gray-300 hover:shadow-md transition-all duration-200"
-              aria-label="Toggle menu"
+              className="lg:hidden p-1.5 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-resk-secondary/40 dark:to-resk-secondary/60 text-gray-700 dark:text-gray-300 hover:shadow-md transition-all duration-200"
+              aria-label={t('nav.toggleMenu', 'Toggle menu')}
             >
               <motion.div
                 animate={{ rotate: isMobileMenuOpen ? 90 : 0 }}
@@ -343,6 +451,7 @@ export default function Navbar() {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
+            ref={mobileMenuRef}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
@@ -365,7 +474,7 @@ export default function Navbar() {
                       className={`px-3 py-2 rounded-lg text-sm font-['Inter'] font-medium transition-all duration-200 ${
                         active
                           ? 'bg-mysecondary/10 dark:bg-mysecondary/20 text-mysecondary dark:text-mysecondary'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-mysecondary dark:hover:text-mysecondary'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-resk-secondary/30 hover:text-mysecondary dark:hover:text-resk-light'
                       }`}
                     >
                       {link.label}
@@ -373,25 +482,39 @@ export default function Navbar() {
                   </motion.div>
                 );
               })}
-              <div className="pt-3 mt-3 border-t border-gray-200/30 dark:border-white/5">
+              <div className="pt-3 mt-3 border-t border-gray-200/30 dark:border-white/5 space-y-2">
                 {!isLoggdedIn ? (
                   <Link
                     to="/portal/login"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center justify-center space-x-1.5 rtl:space-x-reverse w-full px-3 py-2 bg-gradient-to-r from-mysecondary to-[#00d4b8] text-white rounded-lg text-sm font-semibold font-['Inter'] hover:shadow-md hover:shadow-mysecondary/30 transition-all duration-200"
+                    className="flex items-center justify-center space-x-1.5 rtl:space-x-reverse w-full px-3 py-2 bg-gradient-to-r from-resk-primary to-resk-secondary text-white rounded-lg text-sm font-semibold font-['Inter'] hover:shadow-md hover:shadow-resk-secondary/30 transition-all duration-200"
                   >
                     <HiLogin className="w-4 h-4" />
                     <span>{t('nav.login', 'Login')}</span>
                   </Link>
                 ) : (
-                  <Link
-                    to="/portal/dashboard"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center justify-center space-x-1.5 rtl:space-x-reverse w-full px-3 py-2 bg-gradient-to-r from-mysecondary to-[#00d4b8] text-white rounded-lg text-sm font-semibold font-['Inter'] hover:shadow-md hover:shadow-mysecondary/30 transition-all duration-200"
-                  >
-                    <HiUser className="w-4 h-4" />
-                    <span>{t('nav.dashboard', 'Dashboard')}</span>
-                  </Link>
+                  <>
+                    <Link
+                      to="/portal/dashboard"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center justify-center space-x-1.5 rtl:space-x-reverse w-full px-3 py-2 bg-gradient-to-r from-resk-primary to-resk-secondary text-white rounded-lg text-sm font-semibold font-['Inter'] hover:shadow-md hover:shadow-resk-secondary/30 transition-all duration-200"
+                    >
+                      <HiUser className="w-4 h-4" />
+                      <span>{t('nav.dashboard', 'Dashboard')}</span>
+                    </Link>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        handleLogout();
+                      }}
+                      className="flex items-center justify-center space-x-1.5 rtl:space-x-reverse w-full px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg text-sm font-semibold font-['Inter'] hover:shadow-md hover:shadow-red-500/30 transition-all duration-200"
+                    >
+                      <HiLogout className="w-4 h-4" />
+                      <span>{t('nav.logout', 'Logout')}</span>
+                    </motion.button>
+                  </>
                 )}
               </div>
             </div>

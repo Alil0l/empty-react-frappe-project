@@ -14,14 +14,14 @@ const NavigationGuard = ({ children }) => {
     useEffect(() => {
         const checkNavigation = async () => {
             const { pathname } = location;
-            const publicRoutes = ["/portal/login", "/portal/forget-password", "/portal/signup", "/portal/otp"];
+            const publicRoutes = ["/portal/login", "/portal/forget-password", "/portal/signup", "/portal/otp", "/portal/terms"];
 
             // Check if current route is public
             const isPublicRoute = publicRoutes.includes(pathname);
 
             // If logged in user tries to access public routes, redirect to home
             if (isPublicRoute && isLoggdedIn) {
-                navigate("/portal/home", { replace: true });
+                navigate("/portal", { replace: true });
                 return;
             }
 

@@ -1,7 +1,10 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 export default function Hero() {
+  const { t } = useTranslation();
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredCardId, setHoveredCardId] = useState(null);
 
@@ -11,31 +14,31 @@ export default function Hero() {
       id: 1,
       gradient: 'from-blue-500/40 to-purple-600/40',
       icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253',
-      label: 'Architecture',
+      labelKey: 'architecture',
     },
     {
       id: 2,
       gradient: 'from-green-500/40 to-teal-600/40',
       icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
-      label: 'Civil Engineering',
+      labelKey: 'civilEngineering',
     },
     {
       id: 3,
       gradient: 'from-orange-500/40 to-red-600/40',
       icon: 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4',
-      label: 'Design',
+      labelKey: 'design',
     },
     {
       id: 4,
       gradient: 'from-pink-500/40 to-rose-600/40',
       icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
-      label: 'Construction',
+      labelKey: 'construction',
     },
     {
       id: 5,
       gradient: 'from-indigo-500/40 to-blue-600/40',
       icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
-      label: 'Planning',
+      labelKey: 'planning',
     },
   ];
 
@@ -125,7 +128,7 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-myprimary via-myprimary to-[#2a2d6c]">
+    <section className="py-4 relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-resk-darkest via-resk-dark to-resk-primary">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
@@ -173,7 +176,7 @@ export default function Hero() {
               className="inline-block"
             >
               <span className="px-4 py-2 bg-mysecondary/20 text-mysecondary rounded-full text-sm font-semibold font-['Inter'] tracking-wide">
-                RESK Academy
+                {t('hero.badge', 'RESK Academy')}
               </span>
             </motion.div>
 
@@ -181,40 +184,34 @@ export default function Hero() {
               variants={itemVariants}
               className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight font-['Poppins']"
             >
-              Master{' '}
-              <span className="bg-gradient-to-r from-mysecondary to-[#00d4b8] bg-clip-text text-transparent">
-                Civil & Architecture
+              {t('hero.headingPart1', 'Master')}{' '}
+              <span className="bg-gradient-to-r from-resk-primary to-resk-secondary bg-clip-text text-transparent">
+                {t('hero.headingPart2', 'Civil & Architecture')}
               </span>
               <br />
-              Engineering
+              {t('hero.headingPart3', 'Engineering')}
             </motion.h1>
 
             <motion.p
               variants={itemVariants}
               className="text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto lg:mx-0 font-['Inter'] leading-relaxed"
             >
-              Transform your career with expert-led courses in Civil and Architecture Engineering. 
-              Learn from industry professionals and build the skills you need to excel.
+              {t('hero.description', 'Transform your career with expert-led courses in Civil and Architecture Engineering. Learn from industry professionals and build the skills you need to excel.')}
             </motion.p>
 
             <motion.div
               variants={itemVariants}
-              className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4"
+              className="flex justify-center lg:justify-start pt-4"
             >
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 bg-mysecondary text-white rounded-lg font-semibold text-lg font-['Inter'] shadow-lg shadow-mysecondary/30 hover:shadow-mysecondary/50 transition-shadow"
-              >
-                Explore Courses
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 bg-transparent border-2 border-white/30 text-white rounded-lg font-semibold text-lg font-['Inter'] hover:border-white/50 hover:bg-white/10 transition-all"
-              >
-                Learn More
-              </motion.button>
+              <Link to="/portal/contact">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-8 py-4 bg-mysecondary text-white rounded-lg font-semibold text-lg font-['Inter'] shadow-lg shadow-mysecondary/30 hover:shadow-mysecondary/50 transition-shadow"
+                >
+                  {t('hero.learnMore', 'Learn More')}
+                </motion.button>
+              </Link>
             </motion.div>
 
             {/* Stats */}
@@ -223,9 +220,9 @@ export default function Hero() {
               className="grid grid-cols-3 gap-6 pt-8"
             >
               {[
-                { number: '500+', label: 'Students' },
-                { number: '50+', label: 'Courses' },
-                { number: '98%', label: 'Success Rate' },
+                { number: '500+', labelKey: 'students' },
+                { number: '50+', labelKey: 'courses' },
+                { number: '98%', labelKey: 'successRate' },
               ].map((stat, index) => (
                 <motion.div
                   key={index}
@@ -237,7 +234,7 @@ export default function Hero() {
                     {stat.number}
                   </div>
                   <div className="text-sm text-gray-400 font-['Inter'] mt-1">
-                    {stat.label}
+                    {t(`hero.stats.${stat.labelKey}`, stat.labelKey)}
                   </div>
                 </motion.div>
               ))}
@@ -317,10 +314,10 @@ export default function Hero() {
                           </svg>
                         </motion.div>
                         <h3 className="text-white font-semibold text-lg font-['Inter'] mb-2">
-                          {card.label}
+                          {t(`hero.cards.${card.labelKey}`, card.labelKey)}
                         </h3>
                         <p className="text-white/70 text-sm font-['Inter'] text-center">
-                          Course {card.id}
+                          {t('hero.cards.course', 'Course')} {card.id}
                         </p>
                         
                         {/* Shine Effect */}

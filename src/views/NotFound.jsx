@@ -1,9 +1,12 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function NotFound() {
+  const { t } = useTranslation();
+  
   return (
-    <div className="min-h-screen bg-gradient-to-br from-myprimary via-myprimary to-[#2a2d6c] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-resk-darkest via-resk-dark to-resk-primary flex items-center justify-center px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -41,7 +44,7 @@ export default function NotFound() {
           transition={{ delay: 0.3 }}
           className="text-4xl md:text-5xl font-bold text-white mb-4 font-['Poppins']"
         >
-          Page Not Found
+          {t('notFound.title', 'Page Not Found')}
         </motion.h1>
 
         <motion.p
@@ -50,9 +53,9 @@ export default function NotFound() {
           transition={{ delay: 0.4 }}
           className="text-lg text-gray-300 mb-8 font-['Inter']"
         >
-          The page you're looking for doesn't exist or has been moved.
+          {t('notFound.message', "The page you're looking for doesn't exist or has been moved.")}
           <br />
-          Let's get you back on track.
+          {t('notFound.submessage', "Let's get you back on track.")}
         </motion.p>
 
         <motion.div
@@ -66,7 +69,7 @@ export default function NotFound() {
               to="/portal"
               className="inline-block px-8 py-4 bg-mysecondary text-white rounded-lg font-semibold text-lg font-['Inter'] shadow-lg shadow-mysecondary/30 hover:shadow-mysecondary/50 transition-shadow"
             >
-              Go to Home
+              {t('notFound.goHome', 'Go to Home')}
             </Link>
           </motion.div>
           <motion.button
@@ -75,7 +78,7 @@ export default function NotFound() {
             onClick={() => window.history.back()}
             className="px-8 py-4 bg-transparent border-2 border-white/30 text-white rounded-lg font-semibold text-lg font-['Inter'] hover:border-white/50 hover:bg-white/10 transition-all"
           >
-            Go Back
+            {t('notFound.goBack', 'Go Back')}
           </motion.button>
         </motion.div>
       </motion.div>

@@ -27,12 +27,26 @@ after resolving fallback, and the one that has
 a corresponding translation file.
 */
 
+// Get saved language from localStorage before initialization
+const getInitialLanguage = () => {
+  if (typeof window !== 'undefined') {
+    const savedLang = localStorage.getItem('i18nextLng');
+    // Validate saved language is one of our supported languages
+    if (savedLang === 'en' || savedLang === 'ar') {
+      return savedLang;
+    }
+  }
+  return 'ar'; // Default to Arabic
+};
+
+const initialLanguage = getInitialLanguage();
+
 i18n.use(initReactI18next).init({
   resources: {
     en: { translation: en },
     ar: { translation: ar }
   },
-  lng: "ar",
+  lng: initialLanguage,
   fallbackLng: "ar",
   interpolation: {
     escapeValue: false
@@ -41,8 +55,7 @@ i18n.use(initReactI18next).init({
 
 // Set initial document direction
 if (typeof window !== 'undefined') {
-  const savedLang = localStorage.getItem('i18nextLng') || 'ar';
-  document.documentElement.dir = savedLang === 'ar' ? 'rtl' : 'ltr';
+  document.documentElement.dir = initialLanguage === 'ar' ? 'rtl' : 'ltr';
   
   // Update direction when language changes
   i18n.on('languageChanged', (lng) => {

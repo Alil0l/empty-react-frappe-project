@@ -11,6 +11,12 @@ import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import Layout from './components/Layout/Layout';
 import Home from './views/Home';
 import Login from './views/Login';
+import Signup from './views/Signup';
+import SpinWheelView from './views/SpinWheel';
+import Dashboard from './views/Dashboard';
+import About from './views/About';
+import Contact from './views/Contact';
+import Terms from './views/Terms';
 import NotFound from './views/NotFound';
 
 export default function App() {
@@ -49,6 +55,30 @@ const routes = [
 			{
 				path: "login",
 				element: <Login />
+			},
+			{
+				path: "signup",
+				element: <Signup />
+			},
+			{
+				path: "spin-wheel",
+				element: <SpinWheelView />
+			},
+			{
+				path: "dashboard",
+				element: <Dashboard />
+			},
+			{
+				path: "about",
+				element: <About />
+			},
+			{
+				path: "contact",
+				element: <Contact />
+			},
+			{
+				path: "terms",
+				element: <Terms />
 			},
 		]
 	},
