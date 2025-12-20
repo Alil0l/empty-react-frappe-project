@@ -8,7 +8,7 @@ import SpinWheel from '../components/SpinWheel/SpinWheel';
 export default function Dashboard() {
   const { t } = useTranslation();
   const { currUser } = useUserContext();
-  const [activeTab, setActiveTab] = useState('profile');
+  const [activeTab, setActiveTab] = useState('spin');
 
   const tabs = [
     { id: 'profile', label: t('dashboard.profile', 'Profile Details'), icon: HiUser },

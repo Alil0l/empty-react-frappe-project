@@ -2,45 +2,72 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import LOGO from '../../assets/LOGO.png';
+import Image1 from '../../assets/092A0570.jpg';
+import Image2 from '../../assets/092A0609.jpg';
+import Image3 from '../../assets/20250225_202711.jpg';
+import Image4 from '../../assets/J22222-6891 copy.jpg';
+import Image5 from '../../assets/WhatsApp Image 2024-09-01 at 01.43.06_35e6752a.jpg';
 
 export default function Hero() {
   const { t } = useTranslation();
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredCardId, setHoveredCardId] = useState(null);
+  const [clickedCardId, setClickedCardId] = useState(null);
 
-  // Array of image placeholders - replace with actual image paths
-  const imageStack = [
+  // Initial array of images - LOGO first, then others
+  const initialImageStack = [
     {
       id: 1,
+      image: LOGO,
       gradient: 'from-blue-500/40 to-purple-600/40',
-      icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253',
-      labelKey: 'architecture',
+      labelKey: 'logo',
     },
     {
       id: 2,
+      image: Image1,
       gradient: 'from-green-500/40 to-teal-600/40',
-      icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
-      labelKey: 'civilEngineering',
+      labelKey: 'image1',
     },
     {
       id: 3,
+      image: Image2,
       gradient: 'from-orange-500/40 to-red-600/40',
-      icon: 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4',
-      labelKey: 'design',
+      labelKey: 'image2',
     },
     {
       id: 4,
+      image: Image3,
       gradient: 'from-pink-500/40 to-rose-600/40',
-      icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
-      labelKey: 'construction',
+      labelKey: 'image3',
     },
     {
       id: 5,
+      image: Image4,
       gradient: 'from-indigo-500/40 to-blue-600/40',
-      icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
-      labelKey: 'planning',
+      labelKey: 'image4',
+    },
+    {
+      id: 6,
+      image: Image5,
+      gradient: 'from-purple-500/40 to-pink-600/40',
+      labelKey: 'image5',
     },
   ];
+
+  const [imageStack, setImageStack] = useState(initialImageStack);
+
+  // Handle card click - reorder stack to put clicked card first
+  const handleCardClick = (cardId) => {
+    setClickedCardId(cardId);
+    setHoveredCardId(cardId);
+    
+    // Reorder the stack: move clicked card to first position
+    const clickedCard = imageStack.find(card => card.id === cardId);
+    const otherCards = imageStack.filter(card => card.id !== cardId);
+    const newStack = [clickedCard, ...otherCards];
+    setImageStack(newStack);
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -83,9 +110,10 @@ export default function Hero() {
     const rotation = (index - (total - 1) / 2) * 8; // Rotation angle
     const yOffset = index * -3; // Vertical stacking offset
     const isCardHovered = hoveredCardId === cardId;
+    const isCardClicked = clickedCardId === cardId;
     
-    // If a specific card is hovered, bring it to top
-    if (isCardHovered) {
+    // If a specific card is hovered or clicked, bring it to top
+    if (isCardHovered || isCardClicked) {
       return {
         x: offset,
         y: -40, // Lift it higher
@@ -97,8 +125,8 @@ export default function Hero() {
     
     // If container is hovered but not this specific card
     if (isHovered) {
-      // If another card is hovered, keep this card in its position but slightly lower
-      if (hoveredCardId !== null) {
+      // If another card is hovered/clicked, keep this card in its position but slightly lower
+      if (hoveredCardId !== null || clickedCardId !== null) {
         return {
           x: offset,
           y: yOffset - 10,
@@ -248,7 +276,10 @@ export default function Hero() {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => {
               setIsHovered(false);
-              setHoveredCardId(null);
+              // Don't clear hover if a card is clicked
+              if (!clickedCardId) {
+                setHoveredCardId(null);
+              }
             }}
           >
             <div 
@@ -258,6 +289,8 @@ export default function Hero() {
               {imageStack.map((card, index) => {
                 const style = getCardStyle(index, imageStack.length, card.id);
                 const isCardHovered = hoveredCardId === card.id;
+                const isCardClicked = clickedCardId === card.id;
+                const isCardActive = isCardHovered || isCardClicked;
                 return (
                   <motion.div
                     key={card.id}
@@ -279,93 +312,42 @@ export default function Hero() {
                       zIndex: style.zIndex,
                     }}
                     onMouseEnter={() => setHoveredCardId(card.id)}
-                    onMouseLeave={() => setHoveredCardId(null)}
+                    onMouseLeave={() => {
+                      // Don't clear hover if card is clicked
+                      if (!isCardClicked) {
+                        setHoveredCardId(null);
+                      }
+                    }}
+                    onClick={() => handleCardClick(card.id)}
                   >
-                    <div className={`w-full h-full rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br ${card.gradient} backdrop-blur-sm border border-white/10`}>
-                      <div className="w-full h-full flex flex-col items-center justify-center p-8 relative">
-                        {/* Card Content */}
-                        <motion.div
-                          className="w-24 h-24 mb-4 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm"
-                          animate={isCardHovered ? { 
-                            rotate: [0, 360],
-                            scale: [1, 1.2, 1]
-                          } : isHovered ? {
-                            rotate: [0, 360],
+                    <div className="w-full h-full rounded-2xl overflow-hidden shadow-2xl">
+                      <div className="w-full h-full relative">
+                        {/* Image */}
+                        <motion.img
+                          src={card.image}
+                          alt={t(`hero.cards.${card.labelKey}`, card.labelKey)}
+                          className="w-full h-full object-cover"
+                          animate={isCardActive ? { 
                             scale: [1, 1.1, 1]
-                          } : {}}
-                          transition={{
-                            duration: 2,
-                            repeat: (isCardHovered || isHovered) ? Infinity : 0,
-                            ease: 'linear',
+                          } : isHovered ? {
+                            scale: [1, 1.05, 1]
+                          } : {
+                            scale: 1
                           }}
-                        >
-                          <svg
-                            className="w-12 h-12 text-white"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d={card.icon}
-                            />
-                          </svg>
-                        </motion.div>
-                        <h3 className="text-white font-semibold text-lg font-['Inter'] mb-2">
-                          {t(`hero.cards.${card.labelKey}`, card.labelKey)}
-                        </h3>
-                        <p className="text-white/70 text-sm font-['Inter'] text-center">
-                          {t('hero.cards.course', 'Course')} {card.id}
-                        </p>
-                        
-                        {/* Shine Effect */}
-                        <motion.div
-                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
-                          initial={{ x: '-100%' }}
-                          animate={isCardHovered ? { x: '200%' } : isHovered ? { x: '200%' } : { x: '-100%' }}
                           transition={{
-                            duration: 1.5,
-                            repeat: (isCardHovered || isHovered) ? Infinity : 0,
-                            ease: 'linear',
-                          }}
-                          style={{
-                            transform: `rotate(${style.rotate}deg)`,
+                            duration: 0.3,
+                            ease: 'easeInOut',
                           }}
                         />
+                        
+                        {/* Overlay for better text visibility */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
                       </div>
                     </div>
                   </motion.div>
                 );
               })}
             </div>
-
-            {/* Decorative Elements */}
-            <motion.div
-              className="absolute -top-4 -end-4 w-24 h-24 bg-mysecondary/30 rounded-full blur-xl"
-              animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0.5, 0.8, 0.5],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-            />
-            <motion.div
-              className="absolute -bottom-4 -start-4 w-32 h-32 bg-mysecondary/20 rounded-full blur-xl"
-              animate={{
-                scale: [1, 1.3, 1],
-                opacity: [0.4, 0.7, 0.4],
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-            />
           </motion.div>
         </motion.div>
       </div>

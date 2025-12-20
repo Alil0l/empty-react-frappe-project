@@ -9,10 +9,10 @@ import axios from 'axios';
 export default function SpinWheel({
 	// Configurable percentages for each value (should total to 100)
 	percentages = {
-		10: 70,   // 50% chance to win 10 points
-		25: 20,   // 30% chance to win 25 points
-		50: 8,   // 15% chance to win 50 points
-		100: 2,   // 5% chance to win 100 points
+		10: 90,   // 90% chance to win 10 points
+		25: 8,   // 8% chance to win 25 points
+		50: 1.5,   // 1.5% chance to win 50 points
+		100: 0.5,   // 0.5% chance to win 100 points
 	}
 }) {
 	const { t } = useTranslation();
